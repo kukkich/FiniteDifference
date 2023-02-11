@@ -1,9 +1,11 @@
-﻿namespace FinitDifference.Geometry;
+﻿using FinitDifference.Geometry.Materials;
 
-public readonly record struct GridNode(double X, double Y, bool IsFictitious)
+namespace FinitDifference.Geometry;
+
+public readonly record struct GridNode(double X, double Y, bool IsFictitious, Material Material)
 {
-    public GridNode(Point2D point, bool isFictitious)
-        : this(point.X, point.Y, isFictitious)
+    public GridNode(Point2D point, bool isFictitious, Material material)
+        : this(point.X, point.Y, isFictitious, material)
         { }
         
 }

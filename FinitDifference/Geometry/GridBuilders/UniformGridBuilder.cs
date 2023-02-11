@@ -1,15 +1,20 @@
-﻿namespace FinitDifference.Geometry;
+﻿using FinitDifference.Geometry.Areas;
+using FinitDifference.Geometry.Materials;
 
-public class UniformGridBuilder
+namespace FinitDifference.Geometry.GridBuilders;
+
+public class UniformGridBuilder : IGridBuilder
 {
     private readonly AxisSplitParameter _splitParameter;
+    private readonly IMaterialProvider _materialProvider;
 
-    public UniformGridBuilder(AxisSplitParameter splitParameter)
+    public UniformGridBuilder(AxisSplitParameter splitParameter, IMaterialProvider materialProvider)
     {
         _splitParameter = splitParameter;
+        _materialProvider = materialProvider;
     }
 
-    public Grid Build(ГArea area)
+    public Grid Build(IRectangularLikeArea area)
     {
         var stepSize = new Point2D(
             CalcStep(area.LeftBottom.X, area.RightBottom.X, _splitParameter.XSteps),
@@ -24,7 +29,7 @@ public class UniformGridBuilder
         return (upperBound - loweBound) / stepsCount;
     }
 
-    private GridNode[,] GenerateNodes(ГArea area, Point2D stepSize)
+    private GridNode[,] GenerateNodes(IRectangularLikeArea area, Point2D stepSize)
     {
         var nodes = new GridNode[_splitParameter.YSteps + 1, _splitParameter.XSteps + 1];
         for (var i = 0; i <= _splitParameter.YSteps; i++)
@@ -36,8 +41,9 @@ public class UniformGridBuilder
                 var point = new Point2D(x, y);
 
                 var isFictitious = area.Contains(point);
-                
-                nodes[i, j] = new GridNode(point, isFictitious);
+                var material = _materialProvider.GetMaterialByNodeIndexes(i, j);
+
+                nodes[i, j] = new GridNode(point, isFictitious, material);
             }
         }
 

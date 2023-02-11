@@ -1,10 +1,10 @@
-﻿namespace FinitDifference.Geometry;
+﻿namespace FinitDifference.Geometry.Areas;
 
-public class ГArea
+public class ГArea : IRectangularLikeArea
 {
-    public Point2D[] CornerNodes { get; }
+    private Point2D[] CornerNodes { get; }
     public Point2D LeftBottom => CornerNodes[0];
-    public Point2D RightBottom => new (CornerNodes[5].X, CornerNodes[0].Y);
+    public Point2D RightBottom => new(CornerNodes[5].X, CornerNodes[0].Y);
     public Point2D LeftTop => CornerNodes[4];
     public Point2D RightTop => CornerNodes[5];
 
