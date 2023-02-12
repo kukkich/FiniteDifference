@@ -1,4 +1,8 @@
-﻿namespace FinitDifference.Geometry.Areas;
+﻿using FinitDifference.Geometry.Base;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+
+namespace FinitDifference.Geometry.Areas;
 
 public interface IRectangularLikeArea
 {
@@ -7,5 +11,8 @@ public interface IRectangularLikeArea
     public Point2D LeftTop { get; }
     public Point2D RightTop { get; }
 
-    public bool Contains(Point2D point);
+    public ReadOnlyCollection<Point2D> CornerNodes { get; }
+    public ReadOnlyCollection<Line> Lines { get; }
+    public IEnumerable<Line> VerticalBorderLines { get; }
+    public IEnumerable<Line> HorizontalBorderLines { get; }
 }

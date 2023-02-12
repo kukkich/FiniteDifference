@@ -1,4 +1,6 @@
-﻿namespace FinitDifference.Calculus;
+﻿using System;
+
+namespace FinitDifference.Calculus;
 
 public class DiagonalMatrix
 {
