@@ -2,7 +2,8 @@
 
 public enum NodeType
 {
-    Default,
+    Inner,
     Edge,
     Fictitious,
+    Undefined
 }

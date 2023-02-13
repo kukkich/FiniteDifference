@@ -30,9 +30,8 @@ public class ГArea : IRectangularLikeArea
         if (cornerNodes.Length != 6)
             throw new ArgumentException(nameof(cornerNodes));
 
-        _borderLines = GenerateBorderLines().ToList();
         _cornerNodes = cornerNodes;
-
+        _borderLines = GenerateBorderLines().ToList();
     }
 
     public IEnumerable<Line> GenerateBorderLines()
