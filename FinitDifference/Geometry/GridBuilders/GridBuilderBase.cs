@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Linq;
 using FinitDifference.Geometry.Areas;
+using FinitDifference.Geometry.GridComponents;
 using FinitDifference.Geometry.Materials;
 
 namespace FinitDifference.Geometry.GridBuilders;
@@ -19,23 +21,60 @@ public abstract class GridBuilderBase : IGridBuilder
     public Grid Build(IRectangularLikeArea area)
     {
         Area = area;
-        var nodes = SplitOnNodes(area);
-        MarkInnerAndOuter(nodes);
-        MarkBorderNodes(nodes);
+        var grid = MakeGrid(area);
+        MarkInnerAndOuter(grid);
+        MarkBorderNodes(grid);
 
-        return new Grid(nodes);
+        return grid;
     }
 
-    protected abstract Node[,] SplitOnNodes(IRectangularLikeArea area);
+    protected abstract Grid MakeGrid(IRectangularLikeArea area);
 
-    private void MarkInnerAndOuter(Node[,] nodes)
+    private void MarkInnerAndOuter(Grid grid)
     {
         // Todo Сделать трассировкой лучей
         throw new NotImplementedException();
     }
 
-    private void MarkBorderNodes(Node[,] nodes)
+    private Grid MarkBorderNodes(Grid grid)
     {
+        for (var i = 0; i < grid.NodesPerRow; i++)
+        {
+            for (var j = 0; j < grid.NodesPerRow; j++)
+            {
+                var node = grid[i, j];
+
+                if (node.Type is not NodeType.Inner)
+                {
+                    continue;
+                }
+
+                foreach (var border in grid.Borders
+                             .Where(x => x.Line.XProjection.Has(node.X))
+                             .Where(x => x.IsHorizontal))
+                {
+                    if (Math.Abs(node.Y - border.Line.A.Y) > CalculusConfig.Eps) 
+                        continue;
+
+                    border.BelongedNodeIndexes.Add(new ValueTuple<int, int>(item1: i, item2: j));
+                    if (grid[i, j].Type is not NodeType.Edge)
+                        grid[i, j] = node with { Type = NodeType.Edge };
+                }
+
+                foreach (var border in grid.Borders
+                             .Where(x => x.Line.YProjection.Has(node.Y))
+                             .Where(x => x.IsVertical))
+                {
+                    if (Math.Abs(node.X - border.Line.A.X) > CalculusConfig.Eps) 
+                        continue;
+
+                    border.BelongedNodeIndexes.Add(new ValueTuple<int, int>(item1: i, item2: j));
+                    if (grid[i, j].Type is not NodeType.Edge)
+                        grid[i, j] = node with { Type = NodeType.Edge };
+                }
+            }
+        }
+
         throw new NotImplementedException();
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using FinitDifference.Geometry.Areas;
 using FinitDifference.Geometry.Base;
+using FinitDifference.Geometry.GridComponents;
 using FinitDifference.Geometry.Materials;
 
 namespace FinitDifference.Geometry.GridBuilders;
@@ -11,7 +12,7 @@ public class UniformGridBuilder : GridBuilderBase
         : base(splitParameter, materialProvider)
         { }
 
-    protected override Node[,] SplitOnNodes(IRectangularLikeArea area)
+    protected override Node[,] MakeGrid(IRectangularLikeArea area)
     {
         var stepSize = new Point2D(
             CalcStep(Area.LeftBottom.X, Area.RightBottom.X, SplitParameter.XSteps),

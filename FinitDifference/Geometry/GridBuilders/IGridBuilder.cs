@@ -1,4 +1,5 @@
 ﻿using FinitDifference.Geometry.Areas;
+using FinitDifference.Geometry.GridComponents;
 
 namespace FinitDifference.Geometry.GridBuilders;
 

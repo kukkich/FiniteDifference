@@ -1,5 +1,5 @@
 ﻿using System;
-using FinitDifference.Geometry;
+using FinitDifference.Geometry.GridComponents;
 using FinitDifference.Geometry.Materials;
 
 namespace FinitDifference.Calculus;
