@@ -53,7 +53,7 @@ public abstract class GridBuilderBase : IGridBuilder
                              .Where(x => x.Line.XProjection.Has(node.X))
                              .Where(x => x.IsHorizontal))
                 {
-                    if (Math.Abs(node.Y - border.Line.A.Y) > CalculusConfig.Eps) 
+                    if (Math.Abs(node.Y - border.Line.Begin.Y) > CalculusConfig.Eps) 
                         continue;
 
                     border.BelongedNodeIndexes.Add(new ValueTuple<int, int>(item1: i, item2: j));
@@ -65,7 +65,7 @@ public abstract class GridBuilderBase : IGridBuilder
                              .Where(x => x.Line.YProjection.Has(node.Y))
                              .Where(x => x.IsVertical))
                 {
-                    if (Math.Abs(node.X - border.Line.A.X) > CalculusConfig.Eps) 
+                    if (Math.Abs(node.X - border.Line.Begin.X) > CalculusConfig.Eps) 
                         continue;
 
                     border.BelongedNodeIndexes.Add(new ValueTuple<int, int>(item1: i, item2: j));

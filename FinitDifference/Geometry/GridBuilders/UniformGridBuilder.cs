@@ -12,7 +12,7 @@ public class UniformGridBuilder : GridBuilderBase
         : base(splitParameter, materialProvider)
         { }
 
-    protected override Node[,] MakeGrid(IRectangularLikeArea area)
+    protected override Grid MakeGrid(IRectangularLikeArea area)
     {
         var stepSize = new Point2D(
             CalcStep(Area.LeftBottom.X, Area.RightBottom.X, SplitParameter.XSteps),

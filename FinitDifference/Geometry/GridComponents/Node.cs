@@ -9,4 +9,9 @@ public readonly record struct Node(double X, double Y, NodeType Type, Material M
         : this(point.X, point.Y, type, material)
     { }
 
+    public static implicit operator Point2D(Node node)
+    {
+        return new Point2D(node.X, node.Y);
+    }
+
 }

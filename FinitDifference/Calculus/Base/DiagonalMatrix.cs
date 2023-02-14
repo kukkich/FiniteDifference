@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace FinitDifference.Calculus;
+namespace FinitDifference.Calculus.Base;
 
 public class DiagonalMatrix
 {
@@ -13,7 +13,7 @@ public class DiagonalMatrix
 
     public int[] GetIndexes()
     {
-        return new []
+        return new[]
         {
             -(1 + Padding),
             -1, 0, 1,
@@ -21,6 +21,7 @@ public class DiagonalMatrix
         };
     }
 
+    //Todo override for Span
     public void AddRow(double[] values, int rowIndex)
     {
         if (!IsValidIndex(rowIndex))
@@ -52,7 +53,7 @@ public class DiagonalMatrix
 
     public DiagonalMatrix(int size, int padding)
         : this(new double[DiagonalsNumber, size], padding)
-        { }
+    { }
 
     private void AssertThatIndexesFallOnDiagonals(int row, int column)
     {

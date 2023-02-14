@@ -4,18 +4,18 @@ namespace FinitDifference.Geometry.Base;
 
 public readonly struct Line
 {
-    public Point2D A { get; }
-    public Point2D B { get; }
-    public bool IsVertical => Math.Abs(A.X - B.X) < CalculusConfig.Eps;
-    public bool IsHorizontal => Math.Abs(A.Y - B.Y) < CalculusConfig.Eps;
+    public Point2D Begin { get; }
+    public Point2D End { get; }
+    public bool IsVertical => Math.Abs(Begin.X - End.X) < CalculusConfig.Eps;
+    public bool IsHorizontal => Math.Abs(Begin.Y - End.Y) < CalculusConfig.Eps;
     public LineProjection XProjection { get; }
     public LineProjection YProjection { get; }
 
-    public Line(Point2D a, Point2D b)
+    public Line(Point2D begin, Point2D end)
     {
-        A = a;
-        B = b;
-        XProjection = new LineProjection(Math.Min(A.X, B.X), Math.Max(A.X, B.X));
-        YProjection = new LineProjection(Math.Min(A.Y, B.Y), Math.Max(A.Y, B.Y));
+        Begin = begin;
+        End = end;
+        XProjection = new LineProjection(Math.Min(Begin.X, End.X), Math.Max(Begin.X, End.X));
+        YProjection = new LineProjection(Math.Min(Begin.Y, End.Y), Math.Max(Begin.Y, End.Y));
     }
 }
