@@ -8,7 +8,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Calculus\" />
+    <Folder Include="Calculus\SLAESolution\" />
   </ItemGroup>
 
 </Project>

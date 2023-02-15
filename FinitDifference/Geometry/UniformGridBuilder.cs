@@ -19,9 +19,9 @@ public class UniformGridBuilder
         return new Grid(GenerateNodes(area, stepSize));
     }
 
-    private static double CalcStep(double loweBound, double upperBound, int stepsCount)
+    private static double CalcStep(double lowerBound, double upperBound, int stepsCount)
     {
-        return (upperBound - loweBound) / stepsCount;
+        return (upperBound - lowerBound) / stepsCount;
     }
 
     private GridNode[,] GenerateNodes(ГArea area, Point2D stepSize)

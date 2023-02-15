@@ -8,9 +8,20 @@ public class DiagonalMatrix
 
     public DiagonalMatrix(double[,] diagonals, int padding)
     {
-        if (Diagonals is null || Diagonals.GetLength(0) != DiagonalsNumber)
+        if (diagonals is null || diagonals.GetLength(0) != DiagonalsNumber)
             throw new ArgumentException();
         Diagonals = diagonals;
         Padding = padding;
+    }
+
+    public double this[int i, int j]
+    {
+        get => Diagonals[i, j];
+        set => Diagonals[i, j] = value;
+    }
+
+    public int CountColumns()
+    {
+        return Diagonals.GetLength(1);
     }
 }
