@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using FinitDifference.Geometry.Areas;
 using FinitDifference.Geometry.Base;
 using FinitDifference.Geometry.GridComponents;
@@ -34,7 +35,7 @@ public class UniformGridBuilder : GridBuilderBase
             }
         }
 
-        throw new NotImplementedException();
+        return new Grid(nodes, area.Lines.Select(x => new Border(x)).ToArray());
     }
 
     private static double CalcStep(double loweBound, double upperBound, int stepsCount)

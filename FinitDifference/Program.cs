@@ -22,8 +22,8 @@ internal class Program
             new (6d, 2d),
             new (6d, 4d),
             new (9d, 4d),
-            new (3d, 6d),
-            new (9d, 6d)
+            new (9d, 6d),
+            new (3d, 6d)
         });
 
         Grid grid = new UniformGridBuilder(new AxisSplitParameter(2, 2), new UnitMaterialProvider())
