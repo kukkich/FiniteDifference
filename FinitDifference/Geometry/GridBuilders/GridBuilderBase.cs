@@ -34,14 +34,14 @@ public abstract class GridBuilderBase : IGridBuilder
     private void MarkInnerAndOuter(Grid grid)
     {
         var verticalBorders = grid.Borders.Where(border => border.IsVertical);
+        var horizontalBorders = grid.Borders.Where(border => border.IsHorizontal);
 
         for (var i = 0; i < grid.NodesPerRow; i++)
         {
             for (var j = 0; j < grid.NodesPerColumn; j++)
             {
-                var yHasBorders = verticalBorders.Where(border => border.Line.YProjection.Has(grid[i, j].Y));
-
-                var intersectionsNumber = yHasBorders
+                var intersectionsNumber = verticalBorders
+                    .Where(border => border.Line.YProjection.Has(grid[i, j].Y))
                     .Where(border =>
                         Math.Abs(grid[i, j].Y - border.Line.Begin.Y) > CalculusConfig.Eps &&
                         Math.Abs(grid[i, j].Y - border.Line.End.Y) > CalculusConfig.Eps)
@@ -50,11 +50,11 @@ public abstract class GridBuilderBase : IGridBuilder
                 if (intersectionsNumber % 2 == 1) grid[i, j] = grid[i, j] with { Type = NodeType.Inner };
                 else
                 {
-                    var liesOnBorderNumber = grid.Borders
+                    var liesOnBorder = horizontalBorders
                         .Where(border => Math.Abs(border.Line.Begin.Y - grid[i, j].Y) < CalculusConfig.Eps || Math.Abs(border.Line.End.Y - grid[i, j].Y) < CalculusConfig.Eps)
-                        .Count(border => border.Line.XProjection.Has(grid[i, j].X));
+                        .Any(border => border.Line.XProjection.Has(grid[i, j].X));
 
-                    if (liesOnBorderNumber > 0) grid[i, j] = grid[i, j] with { Type = NodeType.Inner };
+                    if (liesOnBorder) grid[i, j] = grid[i, j] with { Type = NodeType.Inner };
                     else grid[i, j] = grid[i, j] with { Type = NodeType.Fictitious };
                 }
             }
