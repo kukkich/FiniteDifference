@@ -1,4 +1,7 @@
-﻿namespace FinitDifference.Calculus.SLAESolution;
+﻿using System;
+using FinitDifference.Calculus.Base;
+
+namespace FinitDifference.Calculus.SLAESolution;
 
 public class BlockRelaxation
 {
@@ -9,10 +12,11 @@ public class BlockRelaxation
         _relaxation = relaxation;
     }
 
-    public Vector Iterate(BlockDiagonalMatrix blockDiagonalMatrix, Vector currentX, Vector f, out double residual)
+    public Vector Iterate(DiagonalMatrix diagonalMatrix, Vector currentX, Vector f, out double residual)
     {
-        var n = blockDiagonalMatrix.CountColumns();
-        var blockSize = blockDiagonalMatrix.BlockSize;
+        var n = diagonalMatrix.CountColumns();
+        var blockSize = diagonalMatrix.BlockSize;
+        var indexes = diagonalMatrix.GetIndexes();
 
         residual = 0d;
 
@@ -23,7 +27,7 @@ public class BlockRelaxation
         {
             var k0 = i * blockSize;
             var k1 = (i + 1) * blockSize;
-            var r = CalcBlockPart(blockDiagonalMatrix, currentX, k0, k1);
+            var r = CalcBlockPart(diagonalMatrix, currentX, k0, k1);
             var bi = 0;
             for (var j = k0; j < k1; j++, bi++)
             {
@@ -33,7 +37,7 @@ public class BlockRelaxation
                     if (indexes[k] + j < 0 || indexes[k] + j >= n) continue;
                     if (indexes[k] + j < k0 || indexes[k] + j >= k1)
                     {
-                        sum += blockDiagonalMatrix[k, j] * currentX[indexes[k] + j];
+                        sum += diagonalMatrix[k, j] * currentX[indexes[k] + j];
                     }
                 }
                 r[bi] = f[j] - (r[bi] + sum);
@@ -41,7 +45,7 @@ public class BlockRelaxation
                 r[bi] *= _relaxation;
                 sumOfSqVecF += f[j] * f[j];
             }
-            var x = SLAESolver.SolveSLAE(blockDiagonalMatrix, r, k0, k1);
+            var x = SLAESolver.SolveSLAE(diagonalMatrix, r, k0, k1);
             bi = 0;
             for (var j = k0; j < k1; j++, bi++)
             {
@@ -53,10 +57,11 @@ public class BlockRelaxation
         return currentX;
     }
 
-    public Vector CalcBlockPart(BlockDiagonalMatrix blockDiagonalMatrix, Vector x, int k0, int k1)
+    public Vector CalcBlockPart(DiagonalMatrix diagonalMatrix, Vector x, int k0, int k1)
     {
-        var n = blockDiagonalMatrix.CountColumns();
-        var blockSize = blockDiagonalMatrix.CountColumns();
+        var n = diagonalMatrix.CountColumns();
+        var blockSize = diagonalMatrix.CountColumns();
+        var indexes = diagonalMatrix.GetIndexes();
 
         var r = new Vector(blockSize);
         var k = 0;
@@ -73,13 +78,13 @@ public class BlockRelaxation
                 }
                 else
                 {
-                    sum += blockDiagonalMatrix[j, i] * x[indexes[j] + i];
+                    sum += diagonalMatrix[j, i] * x[indexes[j] + i];
                 }
             }
             r[k] = sum;
         }
 
-        var buf = (Vector)r.Clone();
+        var buf = r.Copy();
         k = 0;
         for (var i = k0; i < k1; i++, k++)
         {
@@ -89,7 +94,7 @@ public class BlockRelaxation
                 if (indexes[j] + i < 0 || indexes[j] + i >= n) continue;
                 if (indexes[j] + i >= k0 && indexes[j] + i < k1)
                 {
-                    sum += blockDiagonalMatrix[j, i] * buf[indexes[j] + k];
+                    sum += diagonalMatrix[j, i] * buf[indexes[j] + k];
                 }
             }
             r[k] = sum;

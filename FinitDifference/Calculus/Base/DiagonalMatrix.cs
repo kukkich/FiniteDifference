@@ -5,9 +5,10 @@ namespace FinitDifference.Calculus.Base;
 public class DiagonalMatrix
 {
     private const int DiagonalsNumber = 5;
-    public double[,] Diagonals { get; }
+    private double[,] _diagonals;
     public int Padding { get; }
-    public int Size => Diagonals.GetLength(1);
+    public int BlockSize { get; }
+    public int Size => _diagonals.GetLength(1);
 
     private readonly int[] _privateIndexes;
 
@@ -19,6 +20,11 @@ public class DiagonalMatrix
             -1, 0, 1,
             1 + Padding,
         };
+    }
+
+    public int CountColumns()
+    {
+        return _diagonals.GetLength(1);
     }
 
     //Todo override for Span
@@ -35,25 +41,34 @@ public class DiagonalMatrix
             if (!IsValidIndex(indexInMatrix))
                 continue;
 
-            Diagonals[i, rowIndex] += values[i];
+            _diagonals[i, rowIndex] += values[i];
         }
 
     }
 
-    public DiagonalMatrix(double[,] diagonals, int padding)
+    public DiagonalMatrix(double[,] diagonals, int padding, int blockSize)
     {
         var x = diagonals.GetLength(0);
         if (diagonals is null || diagonals.GetLength(0) != DiagonalsNumber)
             throw new ArgumentException(nameof(diagonals));
         if (Padding < 0) throw new ArgumentOutOfRangeException(nameof(padding));
-        Diagonals = diagonals;
+        if (diagonals.GetLength(1) % blockSize > 0)
+            throw new ArgumentException(nameof(blockSize));
+        _diagonals = diagonals;
         Padding = padding;
+        BlockSize = blockSize;
         _privateIndexes = GetIndexes();
     }
 
-    public DiagonalMatrix(int size, int padding)
-        : this(new double[DiagonalsNumber, size], padding)
+    public DiagonalMatrix(int size, int padding, int blockSize)
+        : this(new double[DiagonalsNumber, size], padding, blockSize)
     { }
+
+    public double this[int i, int j]
+    {
+        get => _diagonals[i, j];
+        set => _diagonals[i, j] = value;
+    }
 
     private void AssertThatIndexesFallOnDiagonals(int row, int column)
     {
@@ -65,13 +80,28 @@ public class DiagonalMatrix
 
     private bool IsValidIndex(int index) => index >= 0 && index < Size;
 
+    public void DecomposeLU()
+    {
+        var n = CountColumns() / BlockSize;
+        for (var i = 0; i < n; i++)
+        {
+            var k0 = i * BlockSize;
+            var k1 = (i + 1) * BlockSize;
+            for (var j = k0 + 1; j < k1; j++)
+            {
+                _diagonals[3, j - 1] /= _diagonals[2, j - 1];
+                _diagonals[2, j] -= _diagonals[3, j - 1] * _diagonals[1, j];
+            }
+        }
+    }
+
     public void Print()
     {
         for (int i = 0; i < DiagonalsNumber; i++)
         {
             for (int j = 0; j < Size; j++)
             {
-                Console.Write($"{Diagonals[i, j]:F3} ");
+                Console.Write($"{_diagonals[i, j]:F3} ");
             }
             Console.WriteLine();
         }
