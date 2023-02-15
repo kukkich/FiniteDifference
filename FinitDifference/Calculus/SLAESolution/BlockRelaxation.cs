@@ -12,10 +12,27 @@ public class BlockRelaxation
         _relaxation = relaxation;
     }
 
-    public Vector Iterate(DiagonalMatrix diagonalMatrix, Vector currentX, Vector f, out double residual)
+    public Vector GetSolution(DiagonalMatrix diagonalMatrix, Vector f, Vector startX, int blockSize, int maxIterations, double eps)
     {
-        var n = diagonalMatrix.CountColumns();
-        var blockSize = diagonalMatrix.BlockSize;
+        if (diagonalMatrix.CountColumns % blockSize > 0)
+            throw new ArgumentException(nameof(blockSize));
+
+        LUDecomposer.DecomposeLU(diagonalMatrix, blockSize);
+        var x = startX;
+        var residual = 1d;
+
+        for (var iteration = 1; iteration <= maxIterations && residual > eps; iteration++)
+        {
+            x = Iterate(diagonalMatrix, x, f, blockSize, out residual);
+            CourseHolder.HoldInCourse(iteration, residual);
+        }
+
+        return x;
+    }
+
+    private Vector Iterate(DiagonalMatrix diagonalMatrix, Vector currentX, Vector f, int blockSize, out double residual)
+    {
+        var n = diagonalMatrix.CountColumns;
         var indexes = diagonalMatrix.GetIndexes();
 
         residual = 0d;
@@ -27,7 +44,7 @@ public class BlockRelaxation
         {
             var k0 = i * blockSize;
             var k1 = (i + 1) * blockSize;
-            var r = CalcBlockPart(diagonalMatrix, currentX, k0, k1);
+            var r = CalcBlockPart(diagonalMatrix, currentX, k0, k1, blockSize);
             var bi = 0;
             for (var j = k0; j < k1; j++, bi++)
             {
@@ -57,13 +74,12 @@ public class BlockRelaxation
         return currentX;
     }
 
-    public Vector CalcBlockPart(DiagonalMatrix diagonalMatrix, Vector x, int k0, int k1)
+    private Vector CalcBlockPart(DiagonalMatrix diagonalMatrix, Vector x, int k0, int k1, int blockSize)
     {
-        var n = diagonalMatrix.CountColumns();
-        var blockSize = diagonalMatrix.CountColumns();
+        var n = diagonalMatrix.CountColumns;
         var indexes = diagonalMatrix.GetIndexes();
 
-        var r = new Vector(blockSize);
+        var r = Vector.Create(blockSize);
         var k = 0;
         for (var i = k0; i < k1; i++, k++)
         {

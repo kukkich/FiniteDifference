@@ -27,7 +27,7 @@ public class SLAESolver
 
     private static Vector CalcY(DiagonalMatrix diagonalMatrix, Vector z, int k0, int k1)
     {
-        var j = diagonalMatrix.BlockSize;
+        var j = k1 - k0;
         var y = z;
 
         y[j - 1] = z[j - 1];

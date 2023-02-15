@@ -7,7 +7,6 @@ public class DiagonalMatrix
     private const int DiagonalsNumber = 5;
     private double[,] _diagonals;
     public int Padding { get; }
-    public int BlockSize { get; }
     public int Size => _diagonals.GetLength(1);
 
     private readonly int[] _privateIndexes;
@@ -22,10 +21,7 @@ public class DiagonalMatrix
         };
     }
 
-    public int CountColumns()
-    {
-        return _diagonals.GetLength(1);
-    }
+    public int CountColumns => _diagonals.GetLength(1);
 
     //Todo override for Span
     public void AddRow(double[] values, int rowIndex)
@@ -46,22 +42,20 @@ public class DiagonalMatrix
 
     }
 
-    public DiagonalMatrix(double[,] diagonals, int padding, int blockSize)
+    public DiagonalMatrix(double[,] diagonals, int padding)
     {
         var x = diagonals.GetLength(0);
         if (diagonals is null || diagonals.GetLength(0) != DiagonalsNumber)
             throw new ArgumentException(nameof(diagonals));
         if (Padding < 0) throw new ArgumentOutOfRangeException(nameof(padding));
-        if (diagonals.GetLength(1) % blockSize > 0)
-            throw new ArgumentException(nameof(blockSize));
+
         _diagonals = diagonals;
         Padding = padding;
-        BlockSize = blockSize;
         _privateIndexes = GetIndexes();
     }
 
-    public DiagonalMatrix(int size, int padding, int blockSize)
-        : this(new double[DiagonalsNumber, size], padding, blockSize)
+    public DiagonalMatrix(int size, int padding)
+        : this(new double[DiagonalsNumber, size], padding)
     { }
 
     public double this[int i, int j]
@@ -79,21 +73,6 @@ public class DiagonalMatrix
     }
 
     private bool IsValidIndex(int index) => index >= 0 && index < Size;
-
-    public void DecomposeLU()
-    {
-        var n = CountColumns() / BlockSize;
-        for (var i = 0; i < n; i++)
-        {
-            var k0 = i * BlockSize;
-            var k1 = (i + 1) * BlockSize;
-            for (var j = k0 + 1; j < k1; j++)
-            {
-                _diagonals[3, j - 1] /= _diagonals[2, j - 1];
-                _diagonals[2, j] -= _diagonals[3, j - 1] * _diagonals[1, j];
-            }
-        }
-    }
 
     public void Print()
     {

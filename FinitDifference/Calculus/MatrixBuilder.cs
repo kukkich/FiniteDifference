@@ -83,7 +83,7 @@ public class MatrixBuilder
                 var value = condition.Func(node);
                 var globalIndex = GetGlobalIndex(index.row, index.column);
 
-                _matrix.Diagonals[2, globalIndex] = TooBigNumber;
+                _matrix[2, globalIndex] = TooBigNumber;
                 _rightSide[globalIndex] = value * TooBigNumber;
             }
         }

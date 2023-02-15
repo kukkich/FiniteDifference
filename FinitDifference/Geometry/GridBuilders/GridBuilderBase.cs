@@ -32,8 +32,17 @@ public abstract class GridBuilderBase : IGridBuilder
 
     private void MarkInnerAndOuter(Grid grid)
     {
-        // Todo Сделать трассировкой лучей
-        throw new NotImplementedException();
+        var verticalBorders = grid.Borders.Where(border => border.IsVertical);
+
+        for (var i = 0; i < grid.NodesCount; i++)
+        {
+            for (var j = 0; j < grid.NodesPerColumn; j++)
+            {
+                var intersectionsNumber = verticalBorders.Count(border => grid[i, j].X < border.Line.Begin.X);
+                if (intersectionsNumber % 2 == 0) grid[i, j] = grid[i, j] with { Type = NodeType.Fictitious };
+                else grid[i, j] = grid[i, j] with { Type = NodeType.Inner };
+            }
+        }
     }
 
     private Grid MarkBorderNodes(Grid grid)
