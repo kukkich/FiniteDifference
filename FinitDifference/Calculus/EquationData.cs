@@ -2,4 +2,4 @@
 
 namespace FinitDifference.Calculus;
 
-public record EquationData(DiagonalMatrix Matrix, double[] Solution,double[] RightSide);
+public record EquationData(DiagonalMatrix Matrix, Vector Solution, Vector RightSide);

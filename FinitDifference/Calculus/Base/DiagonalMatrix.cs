@@ -22,7 +22,7 @@ public class DiagonalMatrix
     }
 
     //Todo override for Span
-    public void AddRow(double[] values, int rowIndex)
+    public void SumRow(double[] values, int rowIndex)
     {
         if (!IsValidIndex(rowIndex))
             throw new ArgumentOutOfRangeException(nameof(rowIndex));
