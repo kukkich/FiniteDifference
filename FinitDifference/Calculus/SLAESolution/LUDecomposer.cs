@@ -6,7 +6,7 @@ public class LUDecomposer
 {
     public static void DecomposeLU(DiagonalMatrix diagonalMatrix, int blockSize)
     {
-        var n = diagonalMatrix.CountColumns() / blockSize;
+        var n = diagonalMatrix.CountColumns / blockSize;
         for (var i = 0; i < n; i++)
         {
             var k0 = i * blockSize;
