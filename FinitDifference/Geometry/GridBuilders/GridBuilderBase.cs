@@ -61,7 +61,7 @@ public abstract class GridBuilderBase : IGridBuilder
         }
     }
 
-    private Grid MarkBorderNodes(Grid grid)
+    private void MarkBorderNodes(Grid grid)
     {
         for (var i = 0; i < grid.NodesPerRow; i++)
         {

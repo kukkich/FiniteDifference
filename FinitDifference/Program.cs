@@ -29,31 +29,13 @@ internal class Program
         Grid grid = new UniformGridBuilder(new AxisSplitParameter(2, 2), new UnitMaterialProvider())
             .Build(area);
 
-        //var matrix = new MatrixBuilder().FromGrid(grid)
-        //    .Build();
+        var matrix = new MatrixBuilder().FromGrid(grid)
+            .ApplySecondBoundary()
+            .ApplyFirstBoundary()
+            .Build();
 
-        //Console.WriteLine();
-        //matrix.Print();
-
-        //var x = new BinaryEquationSolver().Solve(
-        //    1 + 1e-14,
-        //    15,
-        //    x => Math.Pow(x, 6) - 8d * x + 8d - 1d
-        //);
-        //Console.WriteLine($"{x:F5}");
-
-        //var diagonalMatrix = new DiagonalMatrix(new[,]
-        //    {
-        //        { 0d, 0d, 0d, 1d, 1d, 1d },
-        //        { 0d, 1d, 1d, 1d, 1d, 1d },
-        //        { 10d, 10d, 10d, 10d, 10d, 10d },
-        //        { 1d, 1d, 1d, 1d, 1d, 0d },
-        //        { 1d, 1d, 1d, 0d, 0d, 0d }
-        //    },
-        //    2);
-
-        //var blockRelaxation = new BlockRelaxation(1d);
-        //var result = blockRelaxation.GetSolution(diagonalMatrix, new Vector(12d, 13d, 13d, 13d, 13d, 12d), new Vector(0d, 0d, 0d, 0d, 0d, 0d), 2,
-        //    10000, 1e-20d);
+        var blockRelaxation = new BlockRelaxation(1d);
+        var result = blockRelaxation.GetSolution(matrix.Matrix, new Vector(matrix.RightSide), new Vector(matrix.Solution), 2,
+            10000, 1e-20d);
     }
 }
