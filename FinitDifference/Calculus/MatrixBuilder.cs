@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using FinitDifference.Calculus.Base;
 using FinitDifference.Calculus.BoundaryConditions;
+using FinitDifference.Geometry;
 using FinitDifference.Geometry.GridComponents;
 
 namespace FinitDifference.Calculus;
@@ -20,11 +21,22 @@ public class MatrixBuilder
         _matrix = new DiagonalMatrix(grid.NodesCount, grid.NodesPerRow);
         _rightSide = Vector.Create(grid.NodesCount);
 
-        for (int i = 1; i < grid.NodesPerRow - 1; i++)
+        for (int i = 0; i < grid.NodesPerRow; i++)
         {
-            for (int j = 1; j < grid.NodesPerColumn - 1; j++)
+            for (int j = 0; j < grid.NodesPerColumn; j++)
             {
                 var node = grid[i, j];
+
+                if (node.Type is NodeType.Fictitious)
+                {
+                    var index = GetGlobalIndex(i, j);
+                    _matrix[2, index] = 1d;
+                    _rightSide[index] = 0d;
+                    continue;
+                }
+
+                if (node.Type is NodeType.Edge) continue;
+
                 var material = node.Material;
                 GetCoefficients(i, j, out var Kx, out var Ky );
 
@@ -89,7 +101,7 @@ public class MatrixBuilder
                 };
                 var globalIndex = GetGlobalIndex(index.row, index.column);
 
-                _matrix.Diagonals[2, globalIndex] = TooBigNumber;
+                _matrix[2, globalIndex] = TooBigNumber;
                 _rightSide[globalIndex] = value * TooBigNumber;
             }
         }

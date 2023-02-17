@@ -11,10 +11,10 @@ public class ГArea : IRectangularLikeArea
     private const double Eps = 1e-15;
 
     public Point2D LeftBottom => _cornerNodes[0];
-    public Point2D RightBottom => new(_cornerNodes[5].X, _cornerNodes[0].Y);
-    public Point2D LeftTop => _cornerNodes[4];
-    public Point2D RightTop => _cornerNodes[5];
-
+    public Point2D RightBottom => new(_cornerNodes[4].X, _cornerNodes[0].Y);
+    public Point2D RightTop => _cornerNodes[4];
+    public Point2D LeftTop => _cornerNodes[5];
+    
     public ReadOnlyCollection<Point2D> CornerNodes => new(_cornerNodes);
     public ReadOnlyCollection<Line> Lines => new (_borderLines);
     public IEnumerable<Line> VerticalBorderLines => _borderLines.Where(x => x.IsVertical);

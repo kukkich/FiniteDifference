@@ -1,9 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using FinitDifference.Calculus;
+using FinitDifference.Calculus.Base;
+using FinitDifference.Calculus.BoundaryConditions;
 using FinitDifference.Calculus.Equation;
+using FinitDifference.Calculus.SLAESolution;
 using FinitDifference.Geometry;
 using FinitDifference.Geometry.Areas;
+using FinitDifference.Geometry.Base;
 using FinitDifference.Geometry.GridBuilders;
+using FinitDifference.Geometry.GridComponents;
 using FinitDifference.Geometry.Materials;
 
 namespace FinitDifference;
@@ -12,30 +18,38 @@ internal class Program
 {
     static void Main(string[] args)
     {
-        //var area = new ГArea(new Point2D[]
-        //{
-        //    new (3d, 2d),
-        //    new (6d, 2d),
-        //    new (6d, 4d),
-        //    new (9d, 4d),
-        //    new (3d, 6d),
-        //    new (9d, 6d)
-        //});
+        var area = new ГArea(new Point2D[]
+        {
+            new (3d, 2d),
+            new (6d, 2d),
+            new (6d, 4d),
+            new (9d, 4d),
+            new (9d, 6d),
+            new (3d, 6d)
+        });
 
-        //Grid grid = new UniformGridBuilder(new AxisSplitParameter(2, 2), new UnitMaterialProvider())
-        //    .Build(area);
+        Grid grid = new UniformGridBuilder(new AxisSplitParameter(4, 4), new UnitMaterialProvider())
+            .Build(area);
 
-        //var matrix = new MatrixBuilder().FromGrid(grid)
-        //    .Build();
+        var matrix = new MatrixBuilder().FromGrid(grid)
+            //.ApplySecondBoundary(new List<FixedFlow>
+            //{
+            //    new(0, x => x),
+            //})
+            .ApplyFirstBoundary(new FixedValue[]
+            {
+                new (0, x => x + 2),
+                new (1, y => 6 + y),
+                new (2, x => x + 4),
+                new (3, y => 9 + y),
+                new (4, x => x + 6),
+                new (5, y => 3 + y)
+            })
+            .Build();
 
-        //Console.WriteLine();
-        //matrix.Print();
+        var blockRelaxation = new BlockRelaxation(1.0d);
 
-        var x = new BinaryEquationSolver().Solve(
-            1 + 1e-14,
-            15,
-            x => Math.Pow(x, 6) - 8d * x + 8d - 1d
-        );
-        Console.WriteLine($"{x:F5}");
+        blockRelaxation.GetSolution(matrix.Matrix, matrix.RightSide, matrix.Solution, matrix.Matrix.Padding,
+            10000, 1e-20d);
     }
 }

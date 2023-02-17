@@ -5,9 +5,9 @@ namespace FinitDifference.Calculus.Base;
 public class DiagonalMatrix
 {
     private const int DiagonalsNumber = 5;
-    public double[,] Diagonals { get; }
+    private double[,] _diagonals;
     public int Padding { get; }
-    public int Size => Diagonals.GetLength(1);
+    public int Size => _diagonals.GetLength(1);
 
     private readonly int[] _privateIndexes;
 
@@ -20,6 +20,8 @@ public class DiagonalMatrix
             1 + Padding,
         };
     }
+
+    public int CountColumns => _diagonals.GetLength(1);
 
     //Todo override for Span
     public void SumRow(double[] values, int rowIndex)
@@ -35,7 +37,7 @@ public class DiagonalMatrix
             if (!IsValidIndex(indexInMatrix))
                 continue;
 
-            Diagonals[i, rowIndex] += values[i];
+            _diagonals[i, rowIndex] += values[i];
         }
 
     }
@@ -46,7 +48,8 @@ public class DiagonalMatrix
         if (diagonals is null || diagonals.GetLength(0) != DiagonalsNumber)
             throw new ArgumentException(nameof(diagonals));
         if (Padding < 0) throw new ArgumentOutOfRangeException(nameof(padding));
-        Diagonals = diagonals;
+
+        _diagonals = diagonals;
         Padding = padding;
         _privateIndexes = GetIndexes();
     }
@@ -54,6 +57,12 @@ public class DiagonalMatrix
     public DiagonalMatrix(int size, int padding)
         : this(new double[DiagonalsNumber, size], padding)
     { }
+
+    public double this[int i, int j]
+    {
+        get => _diagonals[i, j];
+        set => _diagonals[i, j] = value;
+    }
 
     private void AssertThatIndexesFallOnDiagonals(int row, int column)
     {
@@ -71,7 +80,7 @@ public class DiagonalMatrix
         {
             for (int j = 0; j < Size; j++)
             {
-                Console.Write($"{Diagonals[i, j]:F3} ");
+                Console.Write($"{_diagonals[i, j]:F3} ");
             }
             Console.WriteLine();
         }
