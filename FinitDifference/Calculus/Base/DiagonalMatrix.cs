@@ -24,7 +24,7 @@ public class DiagonalMatrix
     public int CountColumns => _diagonals.GetLength(1);
 
     //Todo override for Span
-    public void AddRow(double[] values, int rowIndex)
+    public void SumRow(double[] values, int rowIndex)
     {
         if (!IsValidIndex(rowIndex))
             throw new ArgumentOutOfRangeException(nameof(rowIndex));

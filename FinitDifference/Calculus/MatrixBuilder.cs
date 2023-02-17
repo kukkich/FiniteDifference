@@ -1,7 +1,8 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Data.Common;
 using FinitDifference.Calculus.Base;
 using FinitDifference.Calculus.BoundaryConditions;
-using FinitDifference.Geometry.Base;
 using FinitDifference.Geometry.GridComponents;
 
 namespace FinitDifference.Calculus;
@@ -38,7 +39,7 @@ public class MatrixBuilder
                     -1 * material.Lambda * Ky.Next,
                 };
 
-                _matrix.AddRow(valuesForInsert, GetGlobalIndex(i, j));
+                _matrix.SumRow(valuesForInsert, GetGlobalIndex(i, j));
             }
         }
         
@@ -80,7 +81,12 @@ public class MatrixBuilder
             foreach (var index in border.BelongedNodeIndexes)
             {
                 var node = _grid[index.row, index.column];
-                var value = condition.Func(node);
+                var value = border.NormalOrientation switch
+                {
+                    NormalOrientation.Left or NormalOrientation.Right => condition.Func(node.Y),
+                    NormalOrientation.Up or NormalOrientation.Down => condition.Func(node.X),
+                    _ => throw new NotSupportedException()
+                };
                 var globalIndex = GetGlobalIndex(index.row, index.column);
 
                 _matrix[2, globalIndex] = TooBigNumber;
@@ -91,41 +97,87 @@ public class MatrixBuilder
         return this;
     }
 
-    public MatrixBuilder ApplySecondBoundary(FixedFlow[] conditions)
+    public MatrixBuilder ApplySecondBoundary(IEnumerable<FixedFlow> conditions)
     {
         foreach (var condition in conditions)
         {
             var border = _grid.Borders[condition.BorderIndex];
 
-            foreach (var index in border.BelongedNodeIndexes)
+            foreach (var (row, column) in border.BelongedNodeIndexes)
             {
-                var node = _grid[index.row, index.column];
+                var node = _grid[row, column];
+                var shift = GetNeighborIndexShift(border.NormalOrientation);
+                
+                Node neighbor = _grid[row + shift.row, column + shift.column];
 
-                Node neighborNode = border.NormalOrientation switch
+                var coefficient = node.Material.Lambda * CalcStep(border.NormalOrientation, neighbor, node);
+
+                var values = new double[5];
+                values[2] = coefficient;
+                switch (border.NormalOrientation)
                 {
-                    NormalOrientation.Left => _grid[index.row, index.column + 1],
-                    NormalOrientation.Right => _grid[index.row, index.column - 1],
-                    NormalOrientation.Up => _grid[index.row - 1, index.column],
-                    NormalOrientation.Down => _grid[index.row + 1, index.column],
+                    case NormalOrientation.Left:
+                        values[3] = -1d * coefficient;
+                        break;
+                    case NormalOrientation.Right: 
+                        values[1] = -1d * coefficient;
+                        break;
+                    case NormalOrientation.Down:
+                        values[4] = -1d * coefficient;
+                        break;
+                    case NormalOrientation.Up:
+                        values[0] = -1d * coefficient;
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                };
+
+                var globalIndex = GetGlobalIndex(row, column);
+                _matrix.SumRow(values, globalIndex);
+                
+                _rightSide[globalIndex] = border.NormalOrientation switch
+                {
+                    NormalOrientation.Left or NormalOrientation.Right => condition.Func(node.Y),
+                    NormalOrientation.Up or NormalOrientation.Down => condition.Func(node.X),
                     _ => throw new NotSupportedException()
                 };
 
-                // Todo
-                // в зависимости от ореинтации границы
-                // получить значение потока (передать в функцию x или y)
-                // и применить краевое
-
             }
         }
-        throw new NotImplementedException();
+
+        return this;
     }
 
     public EquationData Build()
     {
-        return new EquationData(_matrix, null, null);
+        return new EquationData(_matrix, Vector.Create(_rightSide.Length), _rightSide);
     }
 
     private int GetGlobalIndex(int row, int column) => _grid.NodesPerRow * row + column;
+
+    private (int row, int column) GetNeighborIndexShift(NormalOrientation orientation)
+    {
+        return orientation switch
+        {
+            NormalOrientation.Left => new ValueTuple<int, int>(item1: 0, item2: 1),
+            NormalOrientation.Right => new ValueTuple<int, int>(item1: 0, item2: -1),
+            NormalOrientation.Up => new ValueTuple<int, int>(item1: -1, item2: 0),
+            NormalOrientation.Down => new ValueTuple<int, int>(item1: 1, item2: 0),
+            _ => throw new NotSupportedException()
+        };
+    }
+
+    private double CalcStep(NormalOrientation orientation, Node neighbor, Node node)
+    {
+        return orientation switch
+        {
+            NormalOrientation.Left => neighbor.X - node.X,
+            NormalOrientation.Right => node.X - neighbor.X,
+            NormalOrientation.Up => node.Y - neighbor.Y,
+            NormalOrientation.Down => neighbor.Y - node.Y,
+            _ => throw new NotSupportedException()
+        };
+    }
 
     private readonly ref struct AxisCoefficients
     {
