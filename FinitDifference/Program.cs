@@ -4,6 +4,7 @@ using FinitDifference.Calculus;
 using FinitDifference.Calculus.Base;
 using FinitDifference.Calculus.BoundaryConditions;
 using FinitDifference.Calculus.Equation;
+using FinitDifference.Calculus.Function;
 using FinitDifference.Calculus.SLAESolution;
 using FinitDifference.Geometry;
 using FinitDifference.Geometry.Areas;
@@ -31,7 +32,8 @@ internal class Program
         Grid grid = new UniformGridBuilder(new AxisSplitParameter(4, 4), new UnitMaterialProvider())
             .Build(area);
 
-        var matrix = new MatrixBuilder().FromGrid(grid)
+        var matrix = new MatrixBuilder(new AnalyticSourceFunction(p => p.X + p.Y))
+            .FromGrid(grid)
             //.ApplySecondBoundary(new List<FixedFlow>
             //{
             //    new(0, x => x),

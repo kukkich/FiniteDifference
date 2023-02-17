@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Data.Common;
 using FinitDifference.Calculus.Base;
 using FinitDifference.Calculus.BoundaryConditions;
+using FinitDifference.Calculus.Function;
 using FinitDifference.Geometry;
 using FinitDifference.Geometry.GridComponents;
 
@@ -10,10 +11,16 @@ namespace FinitDifference.Calculus;
 
 public class MatrixBuilder
 {
+    private readonly ISourceFunction _sourceFunction;
     public static double TooBigNumber = 1e14;
     private DiagonalMatrix _matrix;
     private Vector _rightSide;
     private Grid _grid;
+
+    public MatrixBuilder(ISourceFunction sourceFunction)
+    {
+        _sourceFunction = sourceFunction;
+    }
 
     public MatrixBuilder FromGrid(Grid grid)
     {
@@ -26,15 +33,17 @@ public class MatrixBuilder
             for (int j = 0; j < grid.NodesPerColumn; j++)
             {
                 var node = grid[i, j];
-
+                var globalNodeIndex = GetGlobalIndex(i, j);
                 if (node.Type is NodeType.Fictitious)
                 {
-                    var index = GetGlobalIndex(i, j);
+                    var index = globalNodeIndex;
                     _matrix[2, index] = 1d;
                     _rightSide[index] = 0d;
                     continue;
                 }
 
+                _rightSide[globalNodeIndex] = _sourceFunction.CalculateIn(node);
+                    
                 if (node.Type is NodeType.Edge) continue;
 
                 var material = node.Material;
@@ -51,7 +60,7 @@ public class MatrixBuilder
                     -1 * material.Lambda * Ky.Next,
                 };
 
-                _matrix.SumRow(valuesForInsert, GetGlobalIndex(i, j));
+                _matrix.SumRow(valuesForInsert, globalNodeIndex);
             }
         }
         
