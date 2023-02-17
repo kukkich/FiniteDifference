@@ -47,12 +47,27 @@ public abstract class GridBuilderBase : IGridBuilder
                         Math.Abs(grid[i, j].Y - border.Line.End.Y) > CalculusConfig.Eps)
                     .Count(border => grid[i, j].X <= border.Line.Begin.X);
 
+                intersectionsNumber += verticalBorders
+                    .Where(border => border.Line.YProjection.Has(grid[i, j].Y))
+                    .Where(border =>
+                        Math.Abs(grid[i, j].Y - border.Line.Begin.Y) < CalculusConfig.Eps ||
+                        Math.Abs(grid[i, j].Y - border.Line.End.Y) < CalculusConfig.Eps)
+                    .Count(border => grid[i, j].X <= border.Line.Begin.X) / 2;
+
                 if (intersectionsNumber % 2 == 1) grid[i, j] = grid[i, j] with { Type = NodeType.Inner };
                 else
                 {
                     var liesOnBorder = horizontalBorders
-                        .Where(border => Math.Abs(border.Line.Begin.Y - grid[i, j].Y) < CalculusConfig.Eps || Math.Abs(border.Line.End.Y - grid[i, j].Y) < CalculusConfig.Eps)
+                        .Where(border =>
+                            Math.Abs(border.Line.Begin.Y - grid[i, j].Y) < CalculusConfig.Eps ||
+                            Math.Abs(border.Line.End.Y - grid[i, j].Y) < CalculusConfig.Eps)
                         .Any(border => border.Line.XProjection.Has(grid[i, j].X));
+
+                    liesOnBorder |= verticalBorders
+                        .Where(border =>
+                            Math.Abs(border.Line.Begin.X - grid[i, j].X) < CalculusConfig.Eps ||
+                            Math.Abs(border.Line.End.X - grid[i, j].X) < CalculusConfig.Eps)
+                        .Any(border => border.Line.YProjection.Has(grid[i, j].Y));
 
                     if (liesOnBorder) grid[i, j] = grid[i, j] with { Type = NodeType.Inner };
                     else grid[i, j] = grid[i, j] with { Type = NodeType.Fictitious };
@@ -99,7 +114,5 @@ public abstract class GridBuilderBase : IGridBuilder
                 }
             }
         }
-
-        throw new NotImplementedException();
     }
 }
