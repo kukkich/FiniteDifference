@@ -13,7 +13,7 @@ public class Grid
     public int NodesCount => _nodes.Length;
     public Border[] Borders { get; }
 
-    private readonly Node[,] _nodes;
+    public readonly Node[,] _nodes;
 
     public Grid(Node[,] nodes, Border[] borders)
     {
