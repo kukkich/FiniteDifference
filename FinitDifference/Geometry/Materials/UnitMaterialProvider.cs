@@ -2,7 +2,7 @@
 
 public class UnitMaterialProvider : IMaterialProvider
 {
-    public Material GetMaterialByNodeIndexes(int row, int column)
+    public Material GetMaterialByIndexes(int row, int column)
     {
         return new Material(1, 1);
     }

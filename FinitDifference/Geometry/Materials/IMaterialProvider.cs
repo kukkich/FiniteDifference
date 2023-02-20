@@ -2,5 +2,5 @@
 
 public interface IMaterialProvider
 {
-    public Material GetMaterialByNodeIndexes(int row, int column);
+    public Material GetMaterialByIndexes(int row, int column);
 }

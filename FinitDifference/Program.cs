@@ -1,6 +1,5 @@
 ﻿using FinitDifference.Calculus;
 using FinitDifference.Calculus.Function;
-using FinitDifference.Geometry;
 using FinitDifference.Geometry.Areas;
 using FinitDifference.Geometry.Base;
 using FinitDifference.Geometry.GridBuilders;
@@ -9,6 +8,7 @@ using FinitDifference.Geometry.Materials;
 using System;
 using System.Globalization;
 using System.Threading;
+using FinitDifference.Geometry.GridBuilders.Splitting;
 
 namespace FinitDifference;
 
@@ -27,7 +27,26 @@ internal class Program
             new (3d, 6d)
         });
 
-        Grid grid = new UniformGridBuilder(new AxisSplitParameter(64, 64), new UnitMaterialProvider())
+        Grid grid = new RectangularGridBuilder(
+                new Point2D<AxisSplitParameter>(
+                    X: new AxisSplitParameter(
+                        new[] { 3d, 6d, 9d },
+                        new IIntervalSplitter[]
+                        {
+                            new UniformSplitter(Steps: 2),
+                            new UniformSplitter(Steps: 2),
+                        }
+                    ),
+                    Y: new AxisSplitParameter(
+                        new[] { 2d, 4d, 6d },
+                        new IIntervalSplitter[]
+                        {
+                            new UniformSplitter(Steps: 2),
+                            new UniformSplitter(Steps: 2),
+                        }
+                    )
+                ),
+                new UnitMaterialProvider())
             .Build(area);
 
         //new AnalyticSourceFunction(p =>
@@ -36,6 +55,5 @@ internal class Program
         var matrix = new MatrixBuilder(new AnalyticSourceFunction(p =>
                 Math.Exp(p.X * p.Y) * (-Math.Pow(p.X, 2) - Math.Pow(p.Y, 2) + 1)))
             .FromGrid(grid);
-
     }
 }

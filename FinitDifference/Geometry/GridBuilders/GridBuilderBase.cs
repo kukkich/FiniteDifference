@@ -3,16 +3,18 @@ using FinitDifference.Geometry.GridComponents;
 using FinitDifference.Geometry.Materials;
 using System;
 using System.Linq;
+using FinitDifference.Geometry.Base;
+using FinitDifference.Geometry.GridBuilders.Splitting;
 
 namespace FinitDifference.Geometry.GridBuilders;
 
-public abstract class GridBuilderBase : IGridBuilder
+public class RectangularGridBuilder : IGridBuilder
 {
-    protected readonly AxisSplitParameter SplitParameter;
+    protected readonly Point2D<AxisSplitParameter> SplitParameter;
     protected readonly IMaterialProvider MaterialProvider;
     protected IRectangularLikeArea Area { get; private set; }
 
-    protected GridBuilderBase(AxisSplitParameter splitParameter, IMaterialProvider materialProvider)
+    public RectangularGridBuilder(Point2D<AxisSplitParameter> splitParameter, IMaterialProvider materialProvider)
     {
         SplitParameter = splitParameter;
         MaterialProvider = materialProvider;
@@ -20,6 +22,8 @@ public abstract class GridBuilderBase : IGridBuilder
 
     public Grid Build(IRectangularLikeArea area)
     {
+        if (!CanBeSplitted(area))
+            throw new ArgumentException();
         Area = area;
         var grid = MakeGrid(area);
         MarkInnerAndOuter(grid);
@@ -28,7 +32,58 @@ public abstract class GridBuilderBase : IGridBuilder
         return grid;
     }
 
-    protected abstract Grid MakeGrid(IRectangularLikeArea area);
+    public bool CanBeSplitted(IRectangularLikeArea area)
+    {
+        if (Math.Abs(area.LeftBottom.X - SplitParameter.X.Sections[0].Begin) > CalculusConfig.Eps)
+            return false;
+        if (Math.Abs(area.RightBottom.X - SplitParameter.X.Sections[^1].End) > CalculusConfig.Eps)
+            return false;
+
+        if (Math.Abs(area.LeftBottom.Y - SplitParameter.Y.Sections[0].Begin) > CalculusConfig.Eps)
+            return false;
+        if (Math.Abs(area.LeftTop.Y - SplitParameter.Y.Sections[^1].End) > CalculusConfig.Eps)
+            return false;
+
+        return true;
+    }
+
+    private Grid MakeGrid(IRectangularLikeArea area)
+    {
+        Point2D<int> totalNodes = GetTotalNodes(area);
+
+        var nodes = new Node[totalNodes.X, totalNodes.Y];
+        var (i, j) = (0, 0);
+
+        foreach (var (ySection, ySplitter) in SplitParameter.Y.SectionWithParameter)
+        {
+            var yValues = ySplitter.EnumerateValues(ySection);
+            if (i > 0) yValues = yValues.Skip(1);
+
+            foreach (var y in yValues)
+            {
+                foreach (var (xSection, xSplitter) in SplitParameter.X.SectionWithParameter)
+                {
+                    var xValues = xSplitter.EnumerateValues(xSection);
+                    if (j > 0) xValues = xValues.Skip(1);
+
+                    foreach (var x in xValues)
+                    {
+                        var point = new Point2D(x, y);
+
+                        var material = MaterialProvider.GetMaterialByIndexes(j, j);
+                        nodes[i, j] = new Node(point, NodeType.Undefined, material);
+
+                        j++;
+                    }
+                }
+
+                j = 0;
+                i++;
+            }
+        }
+
+        return new Grid(nodes, area.Lines.Select(x => new Border(x)).ToArray());
+    }
 
     private void MarkInnerAndOuter(Grid grid)
     {
@@ -53,7 +108,11 @@ public abstract class GridBuilderBase : IGridBuilder
                         Math.Abs(grid[i, j].Y - border.Line.End.Y) < CalculusConfig.Eps)
                     .Count(border => grid[i, j].X <= border.Line.Begin.X) / 2;
 
-                if (intersectionsNumber % 2 == 1) grid[i, j] = grid[i, j] with { Type = NodeType.Inner };
+                if (intersectionsNumber % 2 == 1)
+                {
+                    grid[i, j] = grid[i, j] with { Type = NodeType.Inner };
+
+                }
                 else
                 {
                     var liesOnBorder = horizontalBorders
@@ -114,4 +173,13 @@ public abstract class GridBuilderBase : IGridBuilder
             }
         }
     }
+
+    private Point2D<int> GetTotalNodes(IRectangularLikeArea area)
+    {
+        return new Point2D<int>(
+            SplitParameter.X.Splitters.Sum(x => x.Steps) + 1,
+            SplitParameter.Y.Splitters.Sum(y => y.Steps) + 1
+        );
+    }
+
 }
