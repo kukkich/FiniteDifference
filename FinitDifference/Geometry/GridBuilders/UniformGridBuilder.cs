@@ -1,9 +1,8 @@
-﻿using System;
-using System.Linq;
-using FinitDifference.Geometry.Areas;
+﻿using FinitDifference.Geometry.Areas;
 using FinitDifference.Geometry.Base;
 using FinitDifference.Geometry.GridComponents;
 using FinitDifference.Geometry.Materials;
+using System.Linq;
 
 namespace FinitDifference.Geometry.GridBuilders;
 
@@ -11,7 +10,7 @@ public class UniformGridBuilder : GridBuilderBase
 {
     public UniformGridBuilder(AxisSplitParameter splitParameter, IMaterialProvider materialProvider)
         : base(splitParameter, materialProvider)
-        { }
+    { }
 
     protected override Grid MakeGrid(IRectangularLikeArea area)
     {

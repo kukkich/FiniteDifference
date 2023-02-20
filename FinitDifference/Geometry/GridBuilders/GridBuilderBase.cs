@@ -1,9 +1,8 @@
-﻿using System;
-using System.ComponentModel.Design;
-using System.Linq;
-using FinitDifference.Geometry.Areas;
+﻿using FinitDifference.Geometry.Areas;
 using FinitDifference.Geometry.GridComponents;
 using FinitDifference.Geometry.Materials;
+using System;
+using System.Linq;
 
 namespace FinitDifference.Geometry.GridBuilders;
 

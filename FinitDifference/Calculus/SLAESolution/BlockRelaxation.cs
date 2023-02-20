@@ -1,5 +1,5 @@
-﻿using System;
-using FinitDifference.Calculus.Base;
+﻿using FinitDifference.Calculus.Base;
+using System;
 
 namespace FinitDifference.Calculus.SLAESolution;
 

@@ -1,8 +1,8 @@
-﻿using System;
+﻿using FinitDifference.Geometry.Base;
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using FinitDifference.Geometry.Base;
 
 namespace FinitDifference.Geometry.Areas;
 
@@ -14,9 +14,9 @@ public class ГArea : IRectangularLikeArea
     public Point2D RightBottom => new(_cornerNodes[4].X, _cornerNodes[0].Y);
     public Point2D RightTop => _cornerNodes[4];
     public Point2D LeftTop => _cornerNodes[5];
-    
+
     public ReadOnlyCollection<Point2D> CornerNodes => new(_cornerNodes);
-    public ReadOnlyCollection<Line> Lines => new (_borderLines);
+    public ReadOnlyCollection<Line> Lines => new(_borderLines);
     public IEnumerable<Line> VerticalBorderLines => _borderLines.Where(x => x.IsVertical);
     public IEnumerable<Line> HorizontalBorderLines => _borderLines.Where(x => x.IsHorizontal);
 
@@ -42,43 +42,4 @@ public class ГArea : IRectangularLikeArea
         }
         yield return new Line(_cornerNodes[^1], _cornerNodes[0]);
     }
-
-
-    // TODO Удалить, когда будет придуман алгоритм построения сетки
-    //public NodeType GetNodeType(Point2D point)
-    //{
-    //    if (point.X < LeftBottom.X || point.X > RightTop.X ||
-    //        point.Y < LeftBottom.Y || point.Y > RightTop.Y)
-    //    {
-    //        throw new ArgumentOutOfRangeException();
-    //    }
-
-    //    if (!(point.X > _cornerNodes[1].X && point.Y < _cornerNodes[2].Y))
-    //    {
-    //        return NodeType.Fictitious;
-    //    }
-
-    //    if (point.X > _cornerNodes[1].X)
-    //    {
-
-    //    }
-
-    //    // между x_0 и x_1
-    //    if (InInterval(_cornerNodes[0].X, _cornerNodes[1].X, point.X))
-    //    {
-
-    //    }
-    //    // в x0+0
-    //    if (DistanceX(point, _cornerNodes[0]) <= Eps)
-    //    {
-
-    //    }
-    //    // в x1-0
-    //    if (DistanceX(point, _cornerNodes[1]) <= Eps)
-    //    {
-
-    //    }
-
-    //    throw new NotImplementedException();
-    //}
 }

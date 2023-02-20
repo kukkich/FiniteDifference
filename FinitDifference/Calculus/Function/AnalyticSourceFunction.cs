@@ -1,5 +1,5 @@
-﻿using System;
-using FinitDifference.Geometry.Base;
+﻿using FinitDifference.Geometry.Base;
+using System;
 
 namespace FinitDifference.Calculus.Function;
 

@@ -1,11 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Data.Common;
-using FinitDifference.Calculus.Base;
+﻿using FinitDifference.Calculus.Base;
 using FinitDifference.Calculus.BoundaryConditions;
 using FinitDifference.Calculus.Function;
 using FinitDifference.Geometry;
 using FinitDifference.Geometry.GridComponents;
+using System;
+using System.Collections.Generic;
 
 namespace FinitDifference.Calculus;
 
@@ -43,16 +42,16 @@ public class MatrixBuilder
                 }
 
                 _rightSide[globalNodeIndex] = _sourceFunction.CalculateIn(node);
-                    
+
                 if (node.Type is NodeType.Edge) continue;
 
                 var material = node.Material;
-                GetCoefficients(i, j, out var Kx, out var Ky );
+                GetCoefficients(i, j, out var Kx, out var Ky);
 
-                var valuesForInsert = new []
+                var valuesForInsert = new[]
                 {
                     -1 * material.Lambda * Ky.Previous,
-                    
+
                     -1 * material.Lambda * Kx.Previous,
                     material.Lambda * (Kx.Current + Ky.Current) + material.Gamma,
                     -1 * material.Lambda * Kx.Next,
@@ -63,7 +62,7 @@ public class MatrixBuilder
                 _matrix.SumRow(valuesForInsert, globalNodeIndex);
             }
         }
-        
+
         return this;
     }
 
@@ -128,7 +127,7 @@ public class MatrixBuilder
             {
                 var node = _grid[row, column];
                 var shift = GetNeighborIndexShift(border.NormalOrientation);
-                
+
                 Node neighbor = _grid[row + shift.row, column + shift.column];
 
                 var coefficient = node.Material.Lambda * CalcStep(border.NormalOrientation, neighbor, node);
@@ -140,7 +139,7 @@ public class MatrixBuilder
                     case NormalOrientation.Left:
                         values[3] = -1d * coefficient;
                         break;
-                    case NormalOrientation.Right: 
+                    case NormalOrientation.Right:
                         values[1] = -1d * coefficient;
                         break;
                     case NormalOrientation.Down:
@@ -155,7 +154,7 @@ public class MatrixBuilder
 
                 var globalIndex = GetGlobalIndex(row, column);
                 _matrix.SumRow(values, globalIndex);
-                
+
                 _rightSide[globalIndex] = border.NormalOrientation switch
                 {
                     NormalOrientation.Left or NormalOrientation.Right => condition.Func(node.Y),

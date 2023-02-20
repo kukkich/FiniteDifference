@@ -1,5 +1,4 @@
 ﻿using FinitDifference.Geometry.Base;
-using FinitDifference.Geometry.GridComponents;
 
 namespace FinitDifference.Calculus.Function;
 

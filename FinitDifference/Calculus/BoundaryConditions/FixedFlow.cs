@@ -1,5 +1,4 @@
-﻿using FinitDifference.Geometry.Base;
-using System;
+﻿using System;
 
 namespace FinitDifference.Calculus.BoundaryConditions;
 

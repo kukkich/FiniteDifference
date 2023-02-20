@@ -5,7 +5,7 @@ namespace FinitDifference.Calculus.Base;
 public class DiagonalMatrix
 {
     private const int DiagonalsNumber = 5;
-    private double[,] _diagonals;
+    private readonly double[,] _diagonals;
     public int Padding { get; }
     public int Size => _diagonals.GetLength(1);
 
