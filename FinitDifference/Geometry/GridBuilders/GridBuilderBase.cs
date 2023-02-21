@@ -90,9 +90,9 @@ public class RectangularGridBuilder : IGridBuilder
         var verticalBorders = grid.Borders.Where(border => border.IsVertical);
         var horizontalBorders = grid.Borders.Where(border => border.IsHorizontal);
 
-        for (var i = 0; i < grid.NodesPerRow; i++)
+        for (var i = 0; i < grid.NodesPerColumn; i++)
         {
-            for (var j = 0; j < grid.NodesPerColumn; j++)
+            for (var j = 0; j < grid.NodesPerRow; j++)
             {
                 var intersectionsNumber = verticalBorders
                     .Where(border => border.Line.YProjection.Has(grid[i, j].Y))
@@ -136,7 +136,7 @@ public class RectangularGridBuilder : IGridBuilder
 
     private void MarkBorderNodes(Grid grid)
     {
-        for (var i = 0; i < grid.NodesPerRow; i++)
+        for (var i = 0; i < grid.NodesPerColumn; i++)
         {
             for (var j = 0; j < grid.NodesPerRow; j++)
             {

@@ -1,5 +1,6 @@
 ﻿using FinitDifference.Calculus.Base;
 using System;
+using System.Threading;
 
 namespace FinitDifference.Calculus.SLAESolution;
 

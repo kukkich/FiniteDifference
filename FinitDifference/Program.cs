@@ -10,6 +10,7 @@ using System.Globalization;
 using System.Threading;
 using FinitDifference.Calculus.BoundaryConditions;
 using FinitDifference.Calculus.SLAESolution;
+using FinitDifference.Geometry;
 using FinitDifference.Geometry.GridBuilders.Splitting;
 
 namespace FinitDifference;
@@ -35,7 +36,7 @@ internal class Program
                         new[] { 3d, 6d, 9d },
                         new IIntervalSplitter[]
                         {
-                            new ProportionalSplitter(steps: 4, dischargeRatio:0.4d),
+                            new UniformSplitter(Steps: 2),
                             new UniformSplitter(Steps: 2),
                         }
                     ),
@@ -51,19 +52,76 @@ internal class Program
                 new UnitMaterialProvider())
             .Build(area);
 
-        var f = new AnalyticSourceFunction(p =>
-            Math.Pow(p.X, 4) + Math.Pow(p.Y, 4) - Math.Pow(12 * p.X, 2) - Math.Pow(12 * p.Y, 6)
-        );
+        var equation = SquareFuncTest(grid);
 
-        var matrix = new MatrixBuilder(new AnalyticSourceFunction(p =>
-                Math.Exp(p.X * p.Y) * (-Math.Pow(p.X, 2) - Math.Pow(p.Y, 2) + 1)))
+        var solution = equation.Solution;
+        for (int i = 0; i < grid.NodesPerColumn; i++)
+        {
+            for (int j = 0; j < grid.NodesPerRow; j++)
+            {
+                var node = grid[i, j];
+                var globalIndex = i * grid.NodesPerRow + j;
+                if (node.Type is NodeType.Inner)
+                    Console.WriteLine($"({node.X:F1}, {node.Y:F1}) {solution[globalIndex]:E14}");
+            }
+        }
+    }
+
+    private static EquationData LinearTest(Grid grid)
+    {
+        var f = new AnalyticSourceFunction(p =>
+            p.X + p.Y
+        );
+        //Console.WriteLine();
+        var equation = new MatrixBuilder(f)
             .FromGrid(grid)
             .ApplyFirstBoundary(new FixedValue[]
             {
-
+                new (0, x => x + 2d),
+                new (1, y => y + 6d),
+                new (2, x => x + 4d),
+                new (3, y => y + 9d),
+                new (4, x => x + 6d),
+                new (5, y => y + 3d),
             })
             .Build();
 
-        SLAESolver.SolveSLAE()
+        var blockRelaxation = new BlockRelaxation(1.5d);
+        blockRelaxation.GetSolution(equation.Matrix, equation.RightSide, equation.Solution, equation.Matrix.Padding,
+            10000, 1e-20d);
+
+        Console.WriteLine();
+
+        return equation;
     }
+
+    private static EquationData SquareFuncTest(Grid grid)
+    {
+        var f = new AnalyticSourceFunction(p =>
+            (p.X * p.X + p.Y * p.Y) - 4d
+        );
+        
+        //Console.WriteLine();
+        var equation = new MatrixBuilder(f)
+            .FromGrid(grid)
+            .ApplyFirstBoundary(new FixedValue[]
+            {
+                new (0, x => x*x + 2d*2),
+                new (1, y => y*y + 6d*6),
+                new (2, x => x*x + 4d*4),
+                new (3, y => y*y + 9d*9),
+                new (4, x => x*x + 6d*6),
+                new (5, y => y*y + 3d*3),
+            })
+            .Build();
+
+        var blockRelaxation = new BlockRelaxation(1.5d);
+        blockRelaxation.GetSolution(equation.Matrix, equation.RightSide, equation.Solution, equation.Matrix.Padding,
+            10000, 1e-20d);
+
+        Console.WriteLine();
+
+        return equation;
+    }
+
 }

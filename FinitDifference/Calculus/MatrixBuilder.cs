@@ -27,9 +27,9 @@ public class MatrixBuilder
         _matrix = new DiagonalMatrix(grid.NodesCount, grid.NodesPerRow);
         _rightSide = Vector.Create(grid.NodesCount);
 
-        for (int i = 0; i < grid.NodesPerRow; i++)
+        for (int i = 0; i < grid.NodesPerColumn; i++)
         {
-            for (int j = 0; j < grid.NodesPerColumn; j++)
+            for (int j = 0; j < grid.NodesPerRow; j++)
             {
                 var node = grid[i, j];
                 var globalNodeIndex = GetGlobalIndex(i, j);
@@ -111,7 +111,7 @@ public class MatrixBuilder
 
 
                 for (var i = 0; i < DiagonalMatrix.DiagonalsNumber; i++)
-                    _matrix[i, globalIndex] = value;
+                    _matrix[i, globalIndex] = 0;
                 
                 _matrix[2, globalIndex] = 1;
                 _rightSide[globalIndex] = value ;
