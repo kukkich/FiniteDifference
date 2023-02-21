@@ -109,8 +109,12 @@ public class MatrixBuilder
                 };
                 var globalIndex = GetGlobalIndex(index.row, index.column);
 
-                _matrix[2, globalIndex] = TooBigNumber;
-                _rightSide[globalIndex] = value * TooBigNumber;
+
+                for (var i = 0; i < DiagonalMatrix.DiagonalsNumber; i++)
+                    _matrix[i, globalIndex] = value;
+                
+                _matrix[2, globalIndex] = 1;
+                _rightSide[globalIndex] = value ;
             }
         }
 

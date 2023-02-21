@@ -8,6 +8,8 @@ using FinitDifference.Geometry.Materials;
 using System;
 using System.Globalization;
 using System.Threading;
+using FinitDifference.Calculus.BoundaryConditions;
+using FinitDifference.Calculus.SLAESolution;
 using FinitDifference.Geometry.GridBuilders.Splitting;
 
 namespace FinitDifference;
@@ -49,11 +51,19 @@ internal class Program
                 new UnitMaterialProvider())
             .Build(area);
 
-        //new AnalyticSourceFunction(p =>
-        //    Math.Pow(p.X, 4) + Math.Pow(p.Y, 4) - Math.Pow(12 * p.X, 2) - Math.Pow(12 * p.Y, 6)
+        var f = new AnalyticSourceFunction(p =>
+            Math.Pow(p.X, 4) + Math.Pow(p.Y, 4) - Math.Pow(12 * p.X, 2) - Math.Pow(12 * p.Y, 6)
+        );
 
         var matrix = new MatrixBuilder(new AnalyticSourceFunction(p =>
                 Math.Exp(p.X * p.Y) * (-Math.Pow(p.X, 2) - Math.Pow(p.Y, 2) + 1)))
-            .FromGrid(grid);
+            .FromGrid(grid)
+            .ApplyFirstBoundary(new FixedValue[]
+            {
+
+            })
+            .Build();
+
+        SLAESolver.SolveSLAE()
     }
 }
