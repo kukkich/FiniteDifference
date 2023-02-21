@@ -51,7 +51,7 @@ public class RectangularGridBuilder : IGridBuilder
     {
         Point2D<int> totalNodes = GetTotalNodes(area);
 
-        var nodes = new Node[totalNodes.X, totalNodes.Y];
+        var nodes = new Node[totalNodes.Y, totalNodes.X];
         var (i, j) = (0, 0);
 
         foreach (var (ySection, ySplitter) in SplitParameter.Y.SectionWithParameter)
