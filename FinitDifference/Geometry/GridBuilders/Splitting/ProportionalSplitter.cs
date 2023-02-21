@@ -32,7 +32,7 @@ public readonly  record struct ProportionalSplitter : IIntervalSplitter
         {
             yield return value;
 
-            value = interval.Begin + Math.Pow(stepNumber, step);
+            value = interval.Begin + step * (Math.Pow(DischargeRatio, stepNumber + 1) - 1d) / (DischargeRatio - 1d);
             stepNumber++;
         }
     }

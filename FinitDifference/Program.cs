@@ -33,7 +33,7 @@ internal class Program
                         new[] { 3d, 6d, 9d },
                         new IIntervalSplitter[]
                         {
-                            new UniformSplitter(Steps: 2),
+                            new ProportionalSplitter(steps: 2, dischargeRatio:2d),
                             new UniformSplitter(Steps: 2),
                         }
                     ),
