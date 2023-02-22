@@ -44,7 +44,6 @@ public class DiagonalMatrix
 
     public DiagonalMatrix(double[,] diagonals, int padding)
     {
-        var x = diagonals.GetLength(0);
         if (diagonals is null || diagonals.GetLength(0) != DiagonalsNumber)
             throw new ArgumentException(nameof(diagonals));
         if (Padding < 0) throw new ArgumentOutOfRangeException(nameof(padding));

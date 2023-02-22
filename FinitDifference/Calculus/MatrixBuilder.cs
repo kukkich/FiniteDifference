@@ -24,7 +24,7 @@ public class MatrixBuilder
     public MatrixBuilder FromGrid(Grid grid)
     {
         _grid = grid;
-        _matrix = new DiagonalMatrix(grid.NodesCount, grid.NodesPerRow);
+        _matrix = new DiagonalMatrix(grid.NodesCount, grid.NodesPerRow - 1);
         _rightSide = Vector.Create(grid.NodesCount);
 
         for (int i = 0; i < grid.NodesPerColumn; i++)
